@@ -2,7 +2,7 @@
 # ================================================
 # 图片信息地址
 IMAGE_INFO_PATH=r''
-
+CHROME_PATH=r''
 # 关注画师路径为空时,在脚本当前路径创建pixiv_crawler文件夹
 # 示例,D:\author
 ROOT_PATH = r''
