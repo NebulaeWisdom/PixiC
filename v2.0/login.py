@@ -8,7 +8,7 @@ import random
 import requests
 
 from config import COOKIE_UPDATE_ENABLED,\
-	ORIGI_COOKIE_LIST,PRO_DIR,USER_ID
+	ORIGI_COOKIE_LIST,PRO_DIR,USER_ID,CHROME_PATH
 from log_record import logger
 from message import TEMP_MSG
 
@@ -103,6 +103,9 @@ class Login(object):
 		# 取消警告语
 		chrome_options.add_experimental_option('useAutomationExtension', False)
 		chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
+		#指定chrome地址
+		if len(CHROME_PATH)>5:
+			hrome_options.binary_location = CHROME_PATH
 		# 用户目录配置
 		chrome_options.add_argument('user-data-dir='+PRO_DIR)
 
