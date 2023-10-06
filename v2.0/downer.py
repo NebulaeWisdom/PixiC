@@ -16,13 +16,13 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-from config import USERS_LIMIT,BOOKMARK_LIMIT
+from config import USERS_LIMIT,BOOKMARK_LIMIT,IMAGE_INFO_PATH
 from db import db_client
 from folder import file_manager
 from log_record import logger
 from login import client
 from message import TEMP_MSG
-
+import json
 
 # class Down(object):
 class Downloader:
@@ -195,6 +195,7 @@ class Downloader:
 		# 赞/喜欢人数
 		likeCount = int(info["illust_details"]["rating_count"])
 		# 评论人数 新接口无该字段
+		uploadTimestamp=int(info["illust_details"]["upload_timestamp"])
 		commentCount = 0
 		# 图片链接组
 		urls = {
@@ -232,7 +233,9 @@ class Downloader:
 			"urls":urls,
 			"original":original,
 		}
-
+        #20231005 -个人改动-加入一项日期。 不改变原字典了
+		new_data=data.copy()
+		new_data["uploadTimestamp"]=int(uploadTimestamp)  
 		# 根据extra字段获取对应的LIMIT和user_path
 		# bookmark表
 		if extra == "bookmark":
@@ -246,7 +249,14 @@ class Downloader:
 		# 判断下载筛选条件,获取作品下载路径
 		# 满足条件   --> 下载器 path=file_manager 入库
 		# 不满足条件 -->  ---      path=None      入库
-		if bookmarkCount > LIMIT:
+		if bookmarkCount > LIMIT: 
+            #加入把作品数据导出到json文件。
+            #实在搞不懂数据库 /start
+			spv_pid = new_data.get('pid')
+			spv_filename = f"{IMAGE_INFO_PATH}/{spv_pid}.json" 
+			with open(spv_filename, 'w') as file:
+				json.dump(new_data, file)
+            #/end
 			path = self.file_manager.mkdir_illusts(user_path,pid)
 			data["path"] = path
 			# 下载器启动
